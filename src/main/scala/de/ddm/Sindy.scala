@@ -2,6 +2,8 @@ package de.ddm
 
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 
+import java.io.{File, PrintWriter}
+
 object Sindy {
 
   private def readData(input: String, spark: SparkSession): Dataset[Row] = {
@@ -32,6 +34,9 @@ object Sindy {
       .collect();
 
     val sortedINDs = INDs.sortBy(tuple => tuple._1);
+
+    val writer = new PrintWriter(new File("results.txt"))
+
     for(tuple <- sortedINDs) {
       val attribute = tuple._1
       val values = tuple._2
@@ -40,7 +45,11 @@ object Sindy {
       if (values.nonEmpty) {
         val valuesString = values.mkString(",");
         println(s"$attribute -> $valuesString")
+
+        writer.write(s"$attribute -> $valuesString")
+        writer.write("\n")
       }
     }
+    writer.close()
   }
 }
